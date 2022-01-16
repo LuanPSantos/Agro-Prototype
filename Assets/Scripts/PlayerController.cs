@@ -6,38 +6,37 @@ using System;
 
 public class PlayerController : NetworkBehaviour
 {
-    private NetworkVariable<bool> canPlay = new NetworkVariable<bool>(false);
     private BowController bowController;
-    private Collider2D ownCcollider;
+    private NetworkVariable<bool> canPlay = new NetworkVariable<bool>(false);
+    private Collider2D ownCollider;
 
     void Start()
     {
+        ownCollider = GetComponent<Collider2D>();
         bowController = GetComponent<BowController>();
-        ownCcollider = GetComponent<Collider2D>();
     }
 
     private void Update()
     {
-        if (IsLocalPlayer)
+        if (IsOwner || IsServer)
         {
             if (canPlay.Value)
             {
                 bowController.enabled = true;
-                ownCcollider.enabled = false;
+                //ownCollider.enabled = false;
             }
             else
             {
                 bowController.enabled = false;
-                ownCcollider.enabled = true;
+                //ownCollider.enabled = true;
             }
         }
     }
 
     public void SetCanPlay(bool canPlay)
     {
-        if (IsServer)
-        {
-            this.canPlay.Value = canPlay;
-        }
+        if (!IsServer) return;
+
+        this.canPlay.Value = canPlay;
     }
 }

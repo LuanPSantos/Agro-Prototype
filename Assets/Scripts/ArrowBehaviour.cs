@@ -30,13 +30,13 @@ public class ArrowBehaviour : MonoBehaviour
         hasCollided = true;
         DisablePhysics();
         ArrowCollided?.Invoke();
-
+        /*
         if(!collision.gameObject.CompareTag("Player"))
         {
             Destroy(gameObject, 5f);
         }
 
-        ownCollider.enabled = false;
+        ownCollider.enabled = false;*/
     }
 
     private void AlignRotation()

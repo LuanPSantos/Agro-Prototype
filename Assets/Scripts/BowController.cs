@@ -7,10 +7,10 @@ using System;
 public class BowController : NetworkBehaviour
 {
     public static event Action<float> LaunchForcePercentChanged;
-    public Transform bowTransform;
     public float timeToFullLoadLauchForce = 0.1f;
     public float releaseThreshold = 0.01f;
     public int maxLaunchForce = 2000;
+    public Transform bowTransform;
     public GameObject arrow;
 
     private Camera mainCamera;
@@ -24,13 +24,12 @@ public class BowController : NetworkBehaviour
 
     void Update()
     {
-        Aim();
-        Pull();
-
-        if (IsLocalPlayer)
+        if (IsOwner)
         {
+            Aim();
+            Pull();
             Fire();
-        }
+        } 
     }
 
     void Aim()
@@ -42,6 +41,7 @@ public class BowController : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
+            NetworkLog.LogInfoServer("Fire");
             FireServerRpc(GetLaunchForce(), GetSpawnPosition(), GetAimDirection(), GetAimRotation());
         }
     }
@@ -64,6 +64,9 @@ public class BowController : NetworkBehaviour
     [ServerRpc]
     void FireServerRpc(float force, Vector3 positon, Vector3 direction, Quaternion rotation)
     {
+        NetworkLog.LogInfoServer("Calling FireServerRpc");
+        if (!IsServer) return;
+
         NetworkLog.LogInfoServer("FireServerRpc");
         GameObject spawnedArrow = Instantiate(arrow, positon, rotation);
 
