@@ -10,11 +10,11 @@ public class ArrowBehaviour : MonoBehaviour
 
     private Rigidbody2D rb;
     private bool hasCollided = false;
-    private Collider2D ownCollider;
+    private Collider2D arrowCollider;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        ownCollider = GetComponent<Collider2D>();
+        arrowCollider = GetComponent<Collider2D>();
     }
 
     void Update()
@@ -30,13 +30,13 @@ public class ArrowBehaviour : MonoBehaviour
         hasCollided = true;
         DisablePhysics();
         ArrowCollided?.Invoke();
-        /*
+
         if(!collision.gameObject.CompareTag("Player"))
         {
             Destroy(gameObject, 5f);
         }
 
-        ownCollider.enabled = false;*/
+        arrowCollider.enabled = false;
     }
 
     private void AlignRotation()

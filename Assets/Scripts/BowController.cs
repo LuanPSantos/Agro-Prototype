@@ -42,7 +42,7 @@ public class BowController : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             NetworkLog.LogInfoServer("Fire");
-            FireServerRpc(GetLaunchForce(), GetSpawnPosition(), GetAimDirection(), GetAimRotation());
+            FireServerRpc(GetLaunchForce(), GetArrowSpawnPosition(), GetAimDirection(), GetAimRotation());
         }
     }
 
@@ -93,7 +93,7 @@ public class BowController : NetworkBehaviour
         return currentLaunchForcePercent * maxLaunchForce;
     }
 
-    private Vector2 GetSpawnPosition()
+    private Vector2 GetArrowSpawnPosition()
     {
         return bowTransform.TransformPoint(Vector3.right);
     }

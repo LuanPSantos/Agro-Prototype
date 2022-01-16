@@ -8,11 +8,11 @@ public class PlayerController : NetworkBehaviour
 {
     private BowController bowController;
     private NetworkVariable<bool> canPlay = new NetworkVariable<bool>(false);
-    private Collider2D ownCollider;
+    private Collider2D playerCollider;
 
     void Start()
     {
-        ownCollider = GetComponent<Collider2D>();
+        playerCollider = GetComponent<Collider2D>();
         bowController = GetComponent<BowController>();
     }
 
@@ -23,12 +23,12 @@ public class PlayerController : NetworkBehaviour
             if (canPlay.Value)
             {
                 bowController.enabled = true;
-                //ownCollider.enabled = false;
+                playerCollider.enabled = false;
             }
             else
             {
                 bowController.enabled = false;
-                //ownCollider.enabled = true;
+                playerCollider.enabled = true;
             }
         }
     }
