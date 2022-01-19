@@ -29,24 +29,36 @@ public class BowController : NetworkBehaviour
             Aim();
             Pull();
             Fire();
-        } 
+        }
     }
 
-    void Aim()
+    [ServerRpc]
+    void FireServerRpc(float force, Vector3 positon, Vector3 direction, Quaternion rotation)
+    {
+        if (!IsServer || !IsHost) return;
+
+        NetworkLog.LogInfoServer("FireServerRpc");
+        GameObject spawnedArrow = Instantiate(arrow, positon, rotation);
+
+        spawnedArrow.GetComponent<NetworkObject>().Spawn();
+        spawnedArrow.GetComponent<Rigidbody2D>().AddForce(direction * force);
+    }
+
+
+    private void Aim()
     {
         bowTransform.rotation = GetAimRotation();
     }
 
-    void Fire()
+    private void Fire()
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            NetworkLog.LogInfoServer("Fire");
             FireServerRpc(GetLaunchForce(), GetArrowSpawnPosition(), GetAimDirection(), GetAimRotation());
         }
     }
 
-    void Pull()
+    private void Pull()
     {
         if (Input.GetKey(KeyCode.Mouse1))
         {
@@ -59,19 +71,6 @@ public class BowController : NetworkBehaviour
                 ReleaseArrow();
             }
         }        
-    }
-
-    [ServerRpc]
-    void FireServerRpc(float force, Vector3 positon, Vector3 direction, Quaternion rotation)
-    {
-        NetworkLog.LogInfoServer("Calling FireServerRpc");
-        if (!IsServer) return;
-
-        NetworkLog.LogInfoServer("FireServerRpc");
-        GameObject spawnedArrow = Instantiate(arrow, positon, rotation);
-
-        spawnedArrow.GetComponent<NetworkObject>().Spawn();
-        spawnedArrow.GetComponent<Rigidbody2D>().AddForce(direction * force);
     }
 
     private Quaternion GetAimRotation()
@@ -100,7 +99,7 @@ public class BowController : NetworkBehaviour
 
     private void PullArrow()
     {
-        NetworkLog.LogInfoServer("PullArrow" + currentLaunchForcePercent);
+        NetworkLog.LogInfoServer("PullArrow " + currentLaunchForcePercent);
         timeSpentPulling += Time.deltaTime;
 
         currentLaunchForcePercent = Mathf.Clamp(timeSpentPulling / timeToFullLoadLauchForce, 0f, 1f);
@@ -109,7 +108,7 @@ public class BowController : NetworkBehaviour
 
     private void ReleaseArrow()
     {
-        NetworkLog.LogInfoServer("UnpullArrow" + currentLaunchForcePercent);
+        NetworkLog.LogInfoServer("ReleaseArrow " + currentLaunchForcePercent);
         timeSpentPulling -= Time.deltaTime;
 
         currentLaunchForcePercent = Mathf.Clamp(timeSpentPulling / timeToFullLoadLauchForce, 0f, 1f);

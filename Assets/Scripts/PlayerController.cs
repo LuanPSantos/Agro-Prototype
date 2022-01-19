@@ -18,7 +18,7 @@ public class PlayerController : NetworkBehaviour
 
     private void Update()
     {
-        if (IsOwner || IsServer)
+        if (IsOwner || IsServer || IsHost)
         {
             if (canPlay.Value)
             {
@@ -35,7 +35,7 @@ public class PlayerController : NetworkBehaviour
 
     public void SetCanPlay(bool canPlay)
     {
-        if (!IsServer) return;
+        if (!IsServer || !IsHost) return;
 
         this.canPlay.Value = canPlay;
     }

@@ -21,7 +21,7 @@ public class TurnManager : NetworkBehaviour
 
     private void StartTurn(ulong playerOne, ulong playerTwo)
     {
-        if (!IsServer) return;
+        if (!IsServer || !IsHost) return;
     
         NetworkLog.LogInfoServer("StartTurn for players with clientId=" + playerOne + " and clientId=" + playerTwo);
 
@@ -34,7 +34,7 @@ public class TurnManager : NetworkBehaviour
 
     private void SwitchTurn()
     {
-        if (!IsServer) return;
+        if (!IsServer || !IsHost) return;
 
         ulong nextPlayerClientId = GetNextPlayerClientId();
         NetworkLog.LogInfoServer("SwitchTurn " + nextPlayerClientId);
@@ -52,6 +52,10 @@ public class TurnManager : NetworkBehaviour
 
     private ulong GetNextPlayerClientId()
     {
+        if(IsHost)
+        {
+            return (currentPlayerClientId.Value + 1) % numbersOfPlayers;
+        }
         return serverOffset + currentPlayerClientId.Value % numbersOfPlayers;
     }
 

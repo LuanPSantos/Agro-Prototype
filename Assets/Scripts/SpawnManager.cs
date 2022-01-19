@@ -19,24 +19,26 @@ public class SpawnManager : NetworkBehaviour
     private NetworkVariable<ulong> playerTwoId = new NetworkVariable<ulong>((ulong)0);
     private NetworkVariable<Vector2> playerOnePosition = new NetworkVariable<Vector2>(Vector2.zero);
     private NetworkVariable<Vector2> playerTwoPosition = new NetworkVariable<Vector2>(Vector2.zero);
-    private NetworkVariable<Vector2> playerOneScale = new NetworkVariable<Vector2>(Vector2.zero);
-    private NetworkVariable<Vector2> playerTwoScale = new NetworkVariable<Vector2>(Vector2.zero);
+    private NetworkVariable<Vector2> playerOneScale = new NetworkVariable<Vector2>(Vector2.one);
+    private NetworkVariable<Vector2> playerTwoScale = new NetworkVariable<Vector2>(Vector2.one);
 
     void Awake()
     {
         StartSingleton();
+
+        NetworkManager.Singleton.OnServerStarted += SetupSpawner;
+        NetworkManager.Singleton.OnClientConnectedCallback += SetupPlayer;
+        NetworkManager.Singleton.OnClientDisconnectCallback += ResetPlayer;
     }
 
     void Start()
-    {
-        NetworkManager.Singleton.OnServerStarted += SetupSpawner;
-        NetworkManager.Singleton.OnClientConnectedCallback += SetupPlayer;
-        NetworkManager.Singleton.OnClientDisconnectCallback += ResetPlayer;  
+    {   
     }
 
     private void SetupPlayer(ulong id)
     {
-        if (!IsServer) return;
+        if (!IsServer || !IsHost) return;
+
         NetworkLog.LogInfoServer("SetupPlayer with cliendId=" + id);
 
         if (!playerOneIsSetted.Value)
@@ -68,8 +70,10 @@ public class SpawnManager : NetworkBehaviour
 
     private void ResetPlayer(ulong id)
     {
-        if (!IsServer) return;
+        if (!IsServer || !IsHost) return;
+
         NetworkLog.LogInfoServer("ResetPlayer with cliendId=" + id);
+
         if (playerOneId.Value == id)
         {
             playerOneId.Value = 0;
@@ -85,11 +89,13 @@ public class SpawnManager : NetworkBehaviour
     private void SetupSpawner()
     {
         CalculateSpawnPosition();
+
+        ResetForHost();
     }
 
     private void CalculateSpawnPosition()
     {
-        if (!IsServer) return;
+        if (!IsServer || !IsHost) return;
 
         float xDistance = UnityEngine.Random.Range(minDistanceFromOrigin, maxDistanceFromOrigin);
 
@@ -116,6 +122,15 @@ public class SpawnManager : NetworkBehaviour
         else
         {
             Destroy(this);
+        }
+    }
+
+    private void ResetForHost()
+    {
+        if (IsHost && playerOneIsSetted.Value)
+        {
+            ResetPlayer(0);
+            SetupPlayer(0);
         }
     }
 }
