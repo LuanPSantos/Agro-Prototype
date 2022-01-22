@@ -19,13 +19,6 @@ public class RelayManager : NetworkBehaviour
     void Awake()
     {
         StartSingleton();
-
-        NetworkManager.Singleton.OnServerStarted += AllowcateRelay;
-    }
-
-    private void AllowcateRelay()
-    {
-
     }
 
     public UnityTransport Transport => NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>();
@@ -34,15 +27,7 @@ public class RelayManager : NetworkBehaviour
 
     public async Task<RelayHostData> SetUpRelay()
     {
-        InitializationOptions inicializationOptions = new InitializationOptions().
-            SetEnvironmentName(environment);
-
-        await UnityServices.InitializeAsync(inicializationOptions);
-
-        if (!AuthenticationService.Instance.IsSignedIn)
-        {
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
-        }
+        InitializeAndSignIn();
 
         Allocation allocation = await Relay.Instance.CreateAllocationAsync(maxConnections);
 
@@ -73,15 +58,7 @@ public class RelayManager : NetworkBehaviour
 
     public async Task<RelayJoinData> JoinRelay(string joinCode)
     {
-        InitializationOptions inicializationOptions = new InitializationOptions().
-            SetEnvironmentName(environment);
-
-        await UnityServices.InitializeAsync(inicializationOptions);
-
-        if (!AuthenticationService.Instance.IsSignedIn)
-        {
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
-        }
+        InitializeAndSignIn();
 
         JoinAllocation allocation = await Relay.Instance.JoinAllocationAsync(joinCode);
 

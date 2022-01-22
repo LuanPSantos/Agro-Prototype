@@ -32,6 +32,7 @@ public class BowController : NetworkBehaviour
         }
     }
 
+    // TODO Poderia disparar um evento e executar essa classe em outra, que só tenha coisas de network
     [ServerRpc]
     void FireServerRpc(float force, Vector3 positon, Vector3 direction, Quaternion rotation)
     {
